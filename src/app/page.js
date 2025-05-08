@@ -392,15 +392,17 @@ export default function HomePage() {
                         </div>
                       ) : (
                         <div className='h-full flex flex-col items-center justify-center'>
-                          <div className='w-24 h-24 rounded-full bg-purple-900/50 flex items-center justify-center mb-4'>
-                            <MessageSquare className='h-10 w-10 text-pink-500' />
+                          <div className='text-center p-8 mt-10'>
+                            <div className='inline-block p-6 rounded-full bg-gradient-to-r from-pink-600/20 to-purple-600/20 mb-4'>
+                              <MessageSquare className='h-8 w-8 text-pink-400' />
+                            </div>
+                            <p className='text-white font-medium'>
+                              Your Creation Awaits
+                            </p>
+                            <p className='text-xs text-pink-300/70 mt-2'>
+                              Enter a prompt to begin
+                            </p>
                           </div>
-                          <h3 className='text-xl font-semibold text-white mb-2'>
-                            Your Creation Awaits
-                          </h3>
-                          <p className='text-pink-400/80 text-sm'>
-                            Enter a prompt to begin
-                          </p>
                         </div>
                       )}
                     </div>

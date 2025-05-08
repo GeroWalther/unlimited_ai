@@ -87,7 +87,7 @@ export default function ImageDisplay({
         </div>
       ) : (
         <div className='text-center p-8'>
-          <div className='inline-block p-6 rounded-full bg-gradient-to-r from-pink-600/20 to-purple-600/20 mb-4'>
+          <div className='inline-block p-6 rounded-full bg-gradient-to-r from-pink-600/20 to-purple-600/20 mb-4 mt-10'>
             <ImageIcon className='h-8 w-8 text-pink-400' />
           </div>
           <p className='text-white font-medium'>Your Creation Awaits</p>
