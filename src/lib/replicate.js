@@ -20,6 +20,7 @@ export async function runReplicateImageGeneration(prompt) {
       height: 1024,
       num_inference_steps: 4,
       guidance_scale: 7.5,
+      allow_nsfw: true, // Enable NSFW content generation
     },
     // Enable streaming for the Flux-Schnell model
     stream: true,

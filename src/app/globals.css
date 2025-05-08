@@ -1,26 +1,175 @@
-@import "tailwindcss";
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 0%;
+    --foreground: 210 40% 98%;
+
+    --card: 0 0% 0%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 322 100% 60%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 270 100% 60%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 322 100% 60%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 322 100% 60%;
+
+    --radius: 0.5rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-black text-foreground;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(236, 72, 153, 0.5);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 72, 153, 0.8);
+}
+
+/* Animated gradient text */
+@keyframes colorCycle {
+  0%,
+  55% {
+    filter: brightness(0) invert(1);
+    opacity: 0.7;
+  }
+  11%,
+  33% {
+    filter: none;
+    opacity: 1;
+  }
+}
+
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: brightness(0) invert(1);
+  animation: colorCycle 10s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  width: 100%;
+  text-align: center;
+}
+
+.gradient-1 {
+  background-image: linear-gradient(90deg, #64c8ff, #30a7ff);
+  color: #30a7ff;
+}
+
+.gradient-2 {
+  background-image: linear-gradient(90deg, #ff2cc4, #ff00c8);
+  color: #ff00c8;
+  animation-delay: 3.33s;
+}
+
+.gradient-3 {
+  background-image: linear-gradient(90deg, #10edff, #06c3ff);
+  color: #06c3ff;
+  animation-delay: 6.66s;
+}
+
+/* Grid background pattern */
+.bg-grid-pattern {
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 97, 211, 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 97, 211, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Gradient animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Button glow effect */
+button[type='submit'] {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, #ff007a, #6e00ff);
+  transition: all 0.3s ease;
+}
+
+button[type='submit']::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  z-index: -1;
+  background: linear-gradient(45deg, #ff007a, #6e00ff, #ff007a);
+  background-size: 400%;
+  filter: blur(15px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+button[type='submit']:hover::before {
+  opacity: 0.7;
+}
+
+button[type='submit']:disabled {
+  background: #333;
+}
+
+button[type='submit']:disabled::before {
+  display: none;
+}
+
+/* Tab styles */
+.tab-button {
+  @apply rounded-full text-white/70 py-3 px-6 font-medium transition-all duration-300;
+}
+
+.tab-button-active {
+  @apply bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-[0_0_15px_rgba(236,72,153,0.3)];
 }

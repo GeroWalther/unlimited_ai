@@ -6,12 +6,11 @@
 export function validatePrompt(prompt) {
   const lowerPrompt = prompt.toLowerCase();
 
-  // Basic content filtering
+  // Basic content filtering - allow artistic nudity but filter harmful content
   if (
     lowerPrompt.includes('illegal') ||
     lowerPrompt.includes('non-consensual') ||
     lowerPrompt.includes('brutal') ||
-    lowerPrompt.includes('violence') ||
     lowerPrompt.includes('gore') ||
     lowerPrompt.includes('blood') ||
     lowerPrompt.includes('torture') ||
@@ -28,11 +27,11 @@ export function validatePrompt(prompt) {
     lowerPrompt.includes('child blood') ||
     lowerPrompt.includes('child torture') ||
     lowerPrompt.includes('child exploitation') ||
-    lowerPrompt.includes('non-consensual depictions') ||
     lowerPrompt.includes('revenge porn')
   ) {
     return { isValid: false, error: 'Prompt violates terms' };
   }
 
+  // Allow artistic nudity and other adult content with artistic value
   return { isValid: true };
 }
