@@ -265,7 +265,7 @@ export default function HomePage() {
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
                             placeholder='Describe the image you want to generate in detail...'
-                            className='min-h-[120px] resize-none'
+                            className='min-h-[200px]  md:min-h-[300px] resize-none'
                           />
                         </div>
 
