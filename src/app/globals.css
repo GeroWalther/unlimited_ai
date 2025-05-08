@@ -87,18 +87,18 @@
 }
 
 .gradient-1 {
-  background-image: linear-gradient(90deg, #007cf0, #00dfd8);
+  background-image: linear-gradient(90deg, #0054a3, #00dfba);
   color: #00dfd8;
 }
 
 .gradient-2 {
-  background-image: linear-gradient(90deg, #7928ca, #ff0080);
+  background-image: linear-gradient(90deg, #665eff, #ff0080);
   animation-delay: 3.33s;
   color: #ff0080;
 }
 
 .gradient-3 {
-  background-image: linear-gradient(90deg, #ff4d4d, #f9cb28);
+  background-image: linear-gradient(90deg, #ff1515, #faff5f);
   animation-delay: 6.66s;
   color: #f9cb28;
 }
