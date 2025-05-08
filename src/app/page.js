@@ -12,8 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Textarea } from './components/ui/textarea';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
-import { useMobile } from './hooks/use-mobile';
+
 import { motion } from 'framer-motion';
 import ImageDisplay from './components/ImageDisplay';
 import { useMutation } from '@tanstack/react-query';
@@ -105,7 +104,7 @@ export default function HomePage() {
   const [generatedText, setGeneratedText] = useState('');
   const [prompt, setPrompt] = useState('');
   const [imageError, setImageError] = useState(false);
-  const isMobile = useMobile();
+  // const isMobile = useMobile();
 
   // Image generation mutation
   const imageMutation = useMutation({
@@ -204,6 +203,7 @@ export default function HomePage() {
       id: 6,
     },
   ];
+  console.log('ACTIVETAB: ', activeTab);
 
   return (
     <main className='min-h-screen bg-black text-white overflow-hidden'>
@@ -218,32 +218,34 @@ export default function HomePage() {
         <div className='container max-w-7xl mx-auto px-4 pb-20'>
           {/* Main Tabs */}
           <div className='mb-12'>
-            <Tabs
-              defaultValue='image'
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className='w-full'>
+            <div className='w-full'>
               <div className='flex justify-center mb-8'>
-                <TabsList className='grid grid-cols-2 w-full max-w-md bg-black/70 p-1.5 border border-purple-900/30 shadow-[0_0_20px_rgba(128,90,213,0.3)]'>
-                  <TabsTrigger
-                    value='image'
-                    className={
+                <div className='grid grid-cols-2 w-full max-w-md bg-black/70 p-1.5 border border-purple-900/30 shadow-[0_0_20px_rgba(128,90,213,0.3)] rounded-full'>
+                  <button
+                    onClick={() => setActiveTab('image')}
+                    className={`flex items-center justify-center px-4 py-2 rounded-full transition-all duration-300 ${
                       activeTab === 'image'
                         ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white'
-                        : ''
-                    }>
+                        : 'text-white/70 hover:text-white'
+                    }`}>
                     <ImageIcon className='h-4 w-4 mr-2' />
                     Image Generation
-                  </TabsTrigger>
-                  <TabsTrigger value='text'>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('text')}
+                    className={`flex items-center justify-center px-4 py-2 rounded-full transition-all duration-300 ${
+                      activeTab === 'text'
+                        ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white'
+                        : 'text-white/70 hover:text-white'
+                    }`}>
                     <MessageSquare className='h-4 w-4 mr-2' />
                     Text Creation
-                  </TabsTrigger>
-                </TabsList>
+                  </button>
+                </div>
               </div>
 
               {/* Image Tab Content */}
-              <TabsContent value='image'>
+              {activeTab === 'image' && (
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
                   {/* Image Input Form */}
                   <div className='bg-black/50 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-[0_0_15px_rgba(236,72,153,0.15)] relative overflow-hidden'>
@@ -279,9 +281,7 @@ export default function HomePage() {
                           ) : (
                             <>
                               <Sparkles className='mr-2 h-4 w-4' />
-                              {activeTab === 'image'
-                                ? 'Generate Image'
-                                : 'Generate Story'}
+                              Generate Image
                             </>
                           )}
                         </Button>
@@ -306,10 +306,10 @@ export default function HomePage() {
                     />
                   </div>
                 </div>
-              </TabsContent>
+              )}
 
               {/* Text Tab Content */}
-              <TabsContent value='text'>
+              {activeTab === 'text' && (
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
                   {/* Text Input Form */}
                   <div className='bg-black/50 backdrop-blur-md rounded-xl p-6 border border-white/10 shadow-[0_0_15px_rgba(236,72,153,0.15)] relative overflow-hidden'>
@@ -406,8 +406,8 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              </TabsContent>
-            </Tabs>
+              )}
+            </div>
           </div>
 
           {/* Community Section */}
