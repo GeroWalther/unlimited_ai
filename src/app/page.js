@@ -24,9 +24,37 @@ const AnimatedHeader = () => {
     <section className='w-full py-12 md:py-24 lg:py-32 relative overflow-hidden flex justify-center items-center'>
       <div className='container max-w-4xl mx-auto flex justify-center items-center'>
         <h1 className='flex flex-col items-center justify-center font-extrabold text-5xl md:text-6xl lg:text-7xl tracking-tighter text-center w-full'>
-          <span className='gradient-text gradient-1'>Create.</span>
-          <span className='gradient-text gradient-2'>Imagine.</span>
-          <span className='gradient-text gradient-3'>Inspire.</span>
+          <motion.span
+            className='gradient-text gradient-1'
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, type: 'spring', stiffness: 50 }}>
+            Create.
+          </motion.span>
+          <motion.span
+            className='gradient-text gradient-2'
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.7,
+              delay: 0.2,
+              type: 'spring',
+              stiffness: 50,
+            }}>
+            Imagine.
+          </motion.span>
+          <motion.span
+            className='gradient-text gradient-3'
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.7,
+              delay: 0.4,
+              type: 'spring',
+              stiffness: 50,
+            }}>
+            Inspire.
+          </motion.span>
         </h1>
       </div>
     </section>
@@ -199,11 +227,11 @@ export default function HomePage() {
                 <TabsList className='grid grid-cols-2 w-full max-w-md bg-black/70 p-1.5 border border-purple-900/30 shadow-[0_0_20px_rgba(128,90,213,0.3)]'>
                   <TabsTrigger
                     value='image'
-                    className={`${
+                    className={
                       activeTab === 'image'
                         ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white'
                         : ''
-                    }`}>
+                    }>
                     <ImageIcon className='h-4 w-4 mr-2' />
                     Image Generation
                   </TabsTrigger>

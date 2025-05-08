@@ -69,12 +69,10 @@
   0%,
   55% {
     filter: brightness(0) invert(1);
-    opacity: 0.7;
   }
   11%,
   33% {
     filter: none;
-    opacity: 1;
   }
 }
 
@@ -84,26 +82,25 @@
   -webkit-text-fill-color: transparent;
   filter: brightness(0) invert(1);
   animation: colorCycle 10s ease-in-out infinite;
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
   width: 100%;
   text-align: center;
 }
 
 .gradient-1 {
-  background-image: linear-gradient(90deg, #64c8ff, #30a7ff);
-  color: #30a7ff;
+  background-image: linear-gradient(90deg, #007cf0, #00dfd8);
+  color: #00dfd8;
 }
 
 .gradient-2 {
-  background-image: linear-gradient(90deg, #ff2cc4, #ff00c8);
-  color: #ff00c8;
+  background-image: linear-gradient(90deg, #7928ca, #ff0080);
   animation-delay: 3.33s;
+  color: #ff0080;
 }
 
 .gradient-3 {
-  background-image: linear-gradient(90deg, #10edff, #06c3ff);
-  color: #06c3ff;
+  background-image: linear-gradient(90deg, #ff4d4d, #f9cb28);
   animation-delay: 6.66s;
+  color: #f9cb28;
 }
 
 /* Grid background pattern */
