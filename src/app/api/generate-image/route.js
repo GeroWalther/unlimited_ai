@@ -4,12 +4,24 @@ import { validatePrompt } from '@/lib/validatePrompt';
 
 /**
  * API route handler for image generation.
- * Receives a POST request with a prompt, validates it, and returns an image URL.
- * NSFW content like artistic nudity is now allowed but harmful content is still filtered.
+ * Receives a POST request with a prompt and options, validates it, and returns an image URL.
+ * NSFW content can be enabled or disabled based on the allowNsfw parameter.
  */
 export async function POST(req) {
   try {
-    const { prompt } = await req.json();
+    const {
+      prompt,
+      model = 'flux-schnell', // Default to FLUX Schnell which is reliably working
+      width = 768,
+      height = 1024,
+      steps = 30,
+      guidance = 7.5,
+      negativePrompt = 'ugly, deformed, disfigured, blurry, bad anatomy, bad hands, cropped, low quality',
+      // Always enable NSFW mode - app is entirely NSFW
+      allowNsfw = true,
+      style,
+      style_type,
+    } = await req.json();
 
     if (!prompt) {
       return NextResponse.json(
@@ -18,50 +30,245 @@ export async function POST(req) {
       );
     }
 
-    // Validate the prompt
-    const validation = validatePrompt(prompt);
+    // Always allow NSFW content
+    const validation = validatePrompt(prompt, true);
     if (!validation.isValid) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    // Generate the image using Replicate
-    const output = await runReplicateImageGeneration(prompt);
-    console.log('Replicate output type:', typeof output, Array.isArray(output));
-
-    // Handle stream response from Replicate
-    if (output && output[0] instanceof ReadableStream) {
-      // Read from the stream to get the binary image data
-      const reader = output[0].getReader();
-      let chunks = [];
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-      }
-
-      // Combine all chunks into a single Uint8Array
-      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-      const combinedChunks = new Uint8Array(totalLength);
-      let position = 0;
-
-      for (const chunk of chunks) {
-        combinedChunks.set(chunk, position);
-        position += chunk.length;
-      }
-
-      // Convert binary data to base64 for display in browser
-      const base64Image = Buffer.from(combinedChunks).toString('base64');
-      const dataUrl = `data:image/png;base64,${base64Image}`;
-
-      return NextResponse.json({ image_url: dataUrl, status: 'completed' });
+    // Map the model selection to actual model IDs
+    let modelName;
+    switch (model.toLowerCase()) {
+      case 'flux-schnell':
+        modelName = 'black-forest-labs/flux-schnell';
+        break;
+      case 'minimax':
+        modelName = 'minimax/image-01';
+        break;
+      default:
+        // Default to FLUX Schnell which is officially supported and reliable
+        console.log(`Unsupported model ${model}, using FLUX Schnell instead`);
+        modelName = 'black-forest-labs/flux-schnell';
     }
 
-    // Fallback if not a stream
-    return NextResponse.json({
-      image_url: Array.isArray(output) ? output[0] : output,
-      status: 'completed',
-    });
+    try {
+      // Generate the image with selected options
+      const output = await runReplicateImageGeneration(prompt, {
+        modelName,
+        width: Number(width),
+        height: Number(height),
+        numSteps: Number(steps),
+        guidanceScale: Number(guidance),
+        allowNsfw: true, // Always allow NSFW content
+        negativePrompt,
+        style, // Pass style for Recraft
+        style_type, // Pass style_type for Ideogram
+      });
+
+      console.log(
+        'Replicate output type:',
+        typeof output,
+        Array.isArray(output)
+      );
+
+      // Log output structure for all models to help debug
+      console.log(
+        `Model ${modelName} output:`,
+        JSON.stringify(output, null, 2).substring(0, 300)
+      );
+
+      // Check if the output is empty or invalid
+      if (
+        !output ||
+        (typeof output === 'object' && Object.keys(output).length === 0)
+      ) {
+        return NextResponse.json(
+          {
+            error: `Model '${modelName}' returned no image data. Use 'black-forest-labs/flux-schnell' for guaranteed results.`,
+            modelName,
+          },
+          { status: 422 }
+        );
+      }
+
+      // Handle stream response from Replicate
+      if (output && output[0] instanceof ReadableStream) {
+        // Read from the stream to get the binary image data
+        const reader = output[0].getReader();
+        let chunks = [];
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+        }
+
+        // Combine all chunks into a single Uint8Array
+        const totalLength = chunks.reduce(
+          (acc, chunk) => acc + chunk.length,
+          0
+        );
+        const combinedChunks = new Uint8Array(totalLength);
+        let position = 0;
+
+        for (const chunk of chunks) {
+          combinedChunks.set(chunk, position);
+          position += chunk.length;
+        }
+
+        // Convert binary data to base64 for display in browser
+        const base64Image = Buffer.from(combinedChunks).toString('base64');
+        const dataUrl = `data:image/png;base64,${base64Image}`;
+
+        return NextResponse.json({
+          image_url: dataUrl,
+          status: 'completed',
+          model: model,
+          nsfw_allowed: allowNsfw,
+        });
+      }
+
+      // Check for FLUX model output structure (direct URL)
+      if (
+        Array.isArray(output) &&
+        typeof output[0] === 'string' &&
+        output[0].startsWith('http')
+      ) {
+        return NextResponse.json({
+          image_url: output[0],
+          status: 'completed',
+          model: model,
+          nsfw_allowed: allowNsfw,
+        });
+      }
+
+      // Check for MiniMax model output structure (returns { images: [url] })
+      if (
+        output &&
+        typeof output === 'object' &&
+        output.images &&
+        Array.isArray(output.images) &&
+        output.images.length > 0
+      ) {
+        console.log(
+          'MiniMax image detected, URL:',
+          output.images[0].substring(0, 100)
+        );
+        return NextResponse.json({
+          image_url: output.images[0],
+          status: 'completed',
+          model: model,
+          nsfw_allowed: allowNsfw,
+        });
+      }
+
+      // Check for output with a specific property structure (some models return {image: url})
+      if (output && typeof output === 'object') {
+        // Some models return { image: url }
+        if (output.image) {
+          return NextResponse.json({
+            image_url: output.image,
+            status: 'completed',
+            model: model,
+            nsfw_allowed: allowNsfw,
+          });
+        }
+
+        // Ideogram often returns { output: [url] }
+        if (
+          output.output &&
+          Array.isArray(output.output) &&
+          output.output.length > 0
+        ) {
+          return NextResponse.json({
+            image_url: output.output[0],
+            status: 'completed',
+            model: model,
+            nsfw_allowed: allowNsfw,
+          });
+        }
+
+        // Recraft model may return images in different formats
+        // It might return a URL directly or an object with a URL property
+        if (model === 'recraft') {
+          console.log(
+            'Handling Recraft model response:',
+            JSON.stringify(output)
+          );
+
+          // Try to find any URL in the output
+          const findUrl = (obj) => {
+            if (!obj) return null;
+            if (typeof obj === 'string' && obj.startsWith('http')) return obj;
+            if (Array.isArray(obj)) {
+              for (const item of obj) {
+                const url = findUrl(item);
+                if (url) return url;
+              }
+            }
+            if (typeof obj === 'object') {
+              for (const key in obj) {
+                const url = findUrl(obj[key]);
+                if (url) return url;
+              }
+            }
+            return null;
+          };
+
+          const imageUrl = findUrl(output);
+          if (imageUrl) {
+            return NextResponse.json({
+              image_url: imageUrl,
+              status: 'completed',
+              model: model,
+              nsfw_allowed: allowNsfw,
+            });
+          }
+        }
+      }
+
+      // Fallback for any other output format
+      return NextResponse.json({
+        image_url: Array.isArray(output)
+          ? output[0]
+          : typeof output === 'string'
+          ? output
+          : null,
+        status: 'completed',
+        model: model,
+        nsfw_allowed: allowNsfw,
+      });
+    } catch (modelError) {
+      console.error('Model error in generate-image API:', modelError);
+
+      // Check for specific error types
+      if (modelError.message.includes('404 Not Found')) {
+        return NextResponse.json(
+          {
+            error: `Model '${modelName}' not found on Replicate. Please try a different model.`,
+            modelName,
+          },
+          { status: 404 }
+        );
+      } else if (modelError.message.includes('422 Unprocessable Entity')) {
+        return NextResponse.json(
+          {
+            error: `Invalid parameters for model '${modelName}': ${modelError.message}`,
+            modelName,
+          },
+          { status: 422 }
+        );
+      }
+
+      // Generic error fallback
+      return NextResponse.json(
+        {
+          error: `Model error with '${modelName}': ${modelError.message}. Please try Flux Schnell which is the most reliable.`,
+          modelName,
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Error in generate-image API:', error);
     return NextResponse.json(

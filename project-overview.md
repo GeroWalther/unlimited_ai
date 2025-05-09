@@ -114,7 +114,7 @@ REPLICATE_API_KEY=your_replicate_token_here
 - Ready for future enhancements
 - Easy to deploy on Vercel
 
-# Features Missing in the AI Image Generation App
+# Features Missing
 
 1. **Text Creation**
 

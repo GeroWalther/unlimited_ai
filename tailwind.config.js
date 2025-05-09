@@ -80,7 +80,43 @@ module.exports = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: '100%',
+            color: 'white',
+            a: {
+              color: '#ec4899',
+              '&:hover': {
+                color: '#ff61d3',
+              },
+            },
+            h1: {
+              color: 'white',
+            },
+            h2: {
+              color: 'white',
+            },
+            h3: {
+              color: 'white',
+            },
+            h4: {
+              color: 'white',
+            },
+            blockquote: {
+              color: '#c4b5fd',
+              borderLeftColor: '#8b5cf6',
+            },
+            code: {
+              color: '#ff77e9',
+            },
+            strong: {
+              color: 'white',
+            },
+          },
+        },
+      },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 };

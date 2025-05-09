@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Download, Share2, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
@@ -44,12 +44,33 @@ export default function ImageDisplay({
 }) {
   const [shareTitle, setShareTitle] = useState('');
   const [showShareForm, setShowShareForm] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
 
   // Get the query client for cache invalidation
   const queryClient = useQueryClient();
 
   // Check if the image data is a base64 string
-  const isBase64 = image && image.startsWith('data:');
+  const isBase64 =
+    image && typeof image === 'string' && image.startsWith('data:');
+
+  // Reset image load error when new image arrives
+  useEffect(() => {
+    if (image) {
+      setImageLoadError(false);
+    }
+  }, [image]);
+
+  // Enhanced image error handler
+  const handleImageError = () => {
+    console.error(
+      'Image failed to load:',
+      image ? image.substring(0, 100) : 'undefined'
+    );
+    setImageLoadError(true);
+    if (onImageError) {
+      onImageError();
+    }
+  };
 
   // Share mutation
   const shareMutation = useMutation({
@@ -100,9 +121,18 @@ export default function ImageDisplay({
             Synthesizing neon dreams...
           </p>
         </div>
-      ) : error ? (
+      ) : error || imageLoadError ? (
         <div className='rounded-md bg-pink-900/20 border border-pink-900 p-4 text-pink-100'>
-          <p>{error}</p>
+          <p>
+            {error ||
+              'The image failed to load. Please try a different prompt or model.'}
+          </p>
+          {imageLoadError && (
+            <p className='mt-2 text-xs'>
+              Some models may be temporarily unavailable. If this model fails
+              repeatedly, try Flux Schnell which is the most reliable option.
+            </p>
+          )}
         </div>
       ) : image ? (
         <div className='space-y-4'>
@@ -115,7 +145,7 @@ export default function ImageDisplay({
                 style={{ maxWidth: '100%', display: 'block' }}
                 width={600}
                 height={600}
-                onError={onImageError}
+                onError={handleImageError}
               />
             ) : (
               // Handle regular URLs with Next.js Image component
@@ -127,7 +157,7 @@ export default function ImageDisplay({
                   sizes='(max-width: 768px) 100vw, 600px'
                   priority
                   className='object-cover'
-                  onError={onImageError}
+                  onError={handleImageError}
                 />
               </div>
             )}
