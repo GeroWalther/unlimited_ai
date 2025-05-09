@@ -113,3 +113,81 @@ REPLICATE_API_KEY=your_replicate_token_here
 - Basic content filtering
 - Ready for future enhancements
 - Easy to deploy on Vercel
+
+# Features Missing in the AI Image Generation App
+
+1. **Text Creation**
+
+   - Currently only supports image generation
+   - Need text-to-text AI model integration (GPT-4, Claude, etc.)
+   - Text editing/formatting tools
+
+2. **User Authentication**
+
+   - Current solution is anonymous with local storage
+   - Need proper sign-up/login system
+   - User profiles with saved creations
+
+3. **Content Moderation**
+
+   - Admin panel to review community content
+   - Auto-moderation for obvious violations
+   - User reporting system
+
+4. **Enhanced Sharing Features**
+
+   - Social sharing (Twitter, Instagram)
+   - Collections/albums for organizing content
+   - Private vs. public sharing options
+
+5. **Advanced Generation Options**
+
+   - Style controls and fine-tuning parameters
+   - Multi-image generation (variations)
+   - Editing/inpainting existing images
+
+6. **NSFW should be supported**
+   - Should be more expensive when using token
+   - Can be exclusive to Pro Subscribers
+
+# Payment Model Options
+
+## Coin-Based System
+
+- **Pros:**
+  - One-time purchases that don't expire
+  - Users only pay for what they use
+  - Flexible tiers of credit packages
+  - No recurring billing concerns for customers
+- **Cons:**
+  - Less predictable revenue
+  - Requires managing coin economy
+  - Need to balance coin costs with server costs
+
+## Subscription Model
+
+- **Pros:**
+  - Predictable recurring revenue
+  - Easier financial forecasting
+  - Can offer tiered plans (Basic/Pro/Enterprise)
+  - Customers may forget to cancel (business advantage)
+- **Cons:**
+  - Higher barrier to entry
+  - Customer commitment anxiety
+  - Churn management required
+
+## Hybrid Approach
+
+- Free tier with basic limitations
+- Subscription for regular users with core features
+- Coin purchases for premium features or higher quality generations
+- Example: "5 free generations daily, or subscribe for 100/month, premium styles cost extra coins"
+
+## Implementation Considerations
+
+- Supabase already handles authentication well
+- Need to add payment processing (Stripe integration)
+- Consider user acquisition strategy (generous free tier early on)
+- For image models, costs scale with usage (unlike fixed-cost SaaS)
+
+A hybrid model would likely work best for this type of content generation app, allowing casual users to participate while monetizing power users appropriately.
