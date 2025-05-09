@@ -1,14 +1,46 @@
+'use client';
 import React, { useState } from 'react';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { Loader2, Sparkles } from 'lucide-react';
 import ImageDisplay from './ImageDisplay';
 import { useMutation } from '@tanstack/react-query';
-import { generateImage } from '@/lib/replicate';
+
+/**
+ * Generates an image using the Replicate API.
+ * @param prompt - The text prompt for image generation.
+ * @returns The output from the Replicate model (usually an image URL or base64 data).
+ */
+export async function generateImage(prompt) {
+  try {
+    const res = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    const data = await res.json();
+    console.log('API response type:', typeof data.image_url);
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Unknown error');
+    }
+
+    // Validate that we have a valid image data
+    if (!data.image_url) {
+      throw new Error('No image data returned from the API');
+    }
+
+    return data.image_url;
+  } catch (error) {
+    console.error('Generate image error:', error);
+    throw error;
+  }
+}
 
 export default function ImageTab() {
   const [imageError, setImageError] = useState(false);
   const [prompt, setPrompt] = useState('');
+
   // Image generation mutation
   const imageMutation = useMutation({
     mutationFn: generateImage,
@@ -20,17 +52,20 @@ export default function ImageTab() {
       console.error('Image mutation error:', error);
     },
   });
+
   // Handle image generation
   function handleGenerateImage(e) {
     e.preventDefault();
     if (!prompt.trim()) return;
     imageMutation.mutate(prompt);
   }
+
   // Handle image error
   const handleImageError = () => {
     console.error('Image failed to load');
     setImageError(true);
   };
+
   return (
     <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
       {/* Image Input Form */}
@@ -49,7 +84,7 @@ export default function ImageTab() {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder='Describe the image you want to generate in detail...'
-                className='min-h-[200px]  md:min-h-[300px] resize-none'
+                className='min-h-[200px] md:min-h-[300px] resize-none'
               />
             </div>
 
