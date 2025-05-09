@@ -1,9 +1,6 @@
 'use client';
 import { useState } from 'react';
-import {
-  Image as ImageIcon,
-  MessageSquare,
-} from 'lucide-react';
+import { Image as ImageIcon, MessageSquare } from 'lucide-react';
 
 import ImageTab from './ImageTab';
 import TextTab from './TextTab';

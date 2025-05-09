@@ -1,9 +1,13 @@
 import { Copy, Loader2, MessageSquare, Share2, Sparkles } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 
 export default function TextTab() {
+  const [textPrompt, setTextPrompt] = useState('');
+  const [generatedText, setGeneratedText] = useState('');
+  const [isGeneratingText, setIsGeneratingText] = useState(false);
+
   const handleCopyText = () => {
     navigator.clipboard.writeText(generatedText);
     alert('Text copied to clipboard!');
@@ -43,7 +47,7 @@ export default function TextTab() {
           <div className='space-y-2'>
             <Textarea
               placeholder='Write a short story about a detective in a neon-lit cyberpunk city...'
-              className='min-h-[200px] resize-none bg-black/50 border-pink-900/50 focus:border-pink-500 text-white'
+              className='min-h-[200px] md:min-h-[300px] resize-none'
               value={textPrompt}
               onChange={(e) => setTextPrompt(e.target.value)}
             />
