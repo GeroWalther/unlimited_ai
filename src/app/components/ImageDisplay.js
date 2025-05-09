@@ -1,17 +1,67 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { Download, Share2, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+// Share image to community
+async function shareToCommmunity({ image, prompt, title }) {
+  try {
+    const res = await fetch('/api/share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'image',
+        title:
+          title || prompt.substring(0, 50) + (prompt.length > 50 ? '...' : ''),
+        prompt,
+        content: image,
+        username: `artist_${Math.floor(Math.random() * 10000)}`, // Random username for now
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Error sharing to community');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Share error:', error);
+    throw error;
+  }
+}
 
 export default function ImageDisplay({
   image,
+  prompt,
   isLoading,
   error,
   onImageError,
 }) {
+  const [shareTitle, setShareTitle] = useState('');
+  const [showShareForm, setShowShareForm] = useState(false);
+
+  // Get the query client for cache invalidation
+  const queryClient = useQueryClient();
+
   // Check if the image data is a base64 string
   const isBase64 = image && image.startsWith('data:');
+
+  // Share mutation
+  const shareMutation = useMutation({
+    mutationFn: shareToCommmunity,
+    onSuccess: () => {
+      setShowShareForm(false);
+      setShareTitle('');
+
+      // Invalidate the community query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['community'] });
+    },
+  });
 
   const handleDownload = () => {
     if (!image) return;
@@ -25,7 +75,16 @@ export default function ImageDisplay({
   };
 
   const handleShare = () => {
-    alert('Shared to community!');
+    setShowShareForm(true);
+  };
+
+  const submitShare = (e) => {
+    e.preventDefault();
+    shareMutation.mutate({
+      image,
+      prompt: prompt || 'No prompt provided',
+      title: shareTitle,
+    });
   };
 
   return (
@@ -74,12 +133,64 @@ export default function ImageDisplay({
             )}
           </div>
 
+          {/* Share form modal - Now after the image */}
+          {showShareForm && (
+            <div className='mb-4 p-4 bg-black/50 backdrop-blur-md rounded-lg border border-pink-500/30'>
+              <h3 className='text-lg font-medium mb-2 text-white'>
+                Share to Community
+              </h3>
+              <form onSubmit={submitShare} className='space-y-3'>
+                <div>
+                  <label className='text-xs text-white/70 mb-1 block'>
+                    Title for your creation
+                  </label>
+                  <input
+                    type='text'
+                    value={shareTitle}
+                    onChange={(e) => setShareTitle(e.target.value)}
+                    placeholder='Give your creation a title'
+                    className='w-full p-2 bg-black/50 border border-white/20 rounded text-white text-sm'
+                  />
+                </div>
+                <div className='flex justify-end gap-2'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() => setShowShareForm(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type='submit'
+                    size='sm'
+                    disabled={shareMutation.isPending}>
+                    {shareMutation.isPending ? 'Sharing...' : 'Confirm Share'}
+                  </Button>
+                </div>
+                {shareMutation.isError && (
+                  <p className='text-pink-500 text-xs'>
+                    {shareMutation.error.message}
+                  </p>
+                )}
+                {shareMutation.isSuccess && (
+                  <p className='text-green-500 text-xs'>
+                    Successfully shared to community!
+                  </p>
+                )}
+              </form>
+            </div>
+          )}
+
           <div className='flex gap-2 justify-end'>
             <Button variant='outline' size='sm' onClick={handleDownload}>
               <Download className='h-4 w-4 mr-1' />
               Download
             </Button>
-            <Button variant='outline' size='sm' onClick={handleShare}>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={handleShare}
+              disabled={shareMutation.isPending}>
               <Share2 className='h-4 w-4 mr-1' />
               Share
             </Button>

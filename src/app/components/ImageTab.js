@@ -119,6 +119,7 @@ export default function ImageTab() {
 
         <ImageDisplay
           image={imageMutation.data}
+          prompt={prompt}
           isLoading={imageMutation.isPending}
           error={imageMutation.error?.message}
           onImageError={handleImageError}

@@ -1,8 +1,16 @@
 import Replicate from 'replicate';
 
 // Initialize the Replicate client with your API key from environment variables
+const apiKey = process.env.REPLICATE_API_KEY;
+
+// Debug log to see if the API key is loading correctly (first 5 chars only for security)
+console.log(
+  'API Key prefix:',
+  apiKey ? `${apiKey.substring(0, 5)}...` : 'undefined'
+);
+
 const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_KEY,
+  auth: apiKey,
 });
 
 /**
