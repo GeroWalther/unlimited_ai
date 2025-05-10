@@ -46,9 +46,6 @@ export async function POST(req) {
       case 'flux-schnell':
         modelName = 'black-forest-labs/flux-schnell';
         break;
-      case 'minimax':
-        modelName = 'minimax/image-01';
-        break;
       case 'sticker-maker':
         modelName =
           'fofr/sticker-maker:4acb778eb059772225ec213948f0660867b2e03f277448f18cf1800b96a65a1a';
@@ -57,8 +54,9 @@ export async function POST(req) {
         modelName =
           'datacte/proteus-v0.3:b28b79d725c8548b173b6a19ff9bffd16b9b80df5b18b8dc5cb9e1ee471bfa48';
         break;
-      case 'sd-3.5':
-        modelName = 'stability-ai/stable-diffusion-3.5-large';
+      case 'babes-xl':
+        modelName =
+          'asiryan/babes-sdxl:a07fcbe80652ccf989e8198654740d7d562de85f573196dd624a8a80285da27d';
         break;
       default:
         // Default to FLUX Schnell which is officially supported and reliable
@@ -212,23 +210,6 @@ export async function POST(req) {
             model: model,
             nsfw_allowed: allowNsfw,
           });
-        }
-
-        // MiniMax specific error handling
-        if (model === 'minimax') {
-          console.log('Handling MiniMax response:', JSON.stringify(output));
-
-          // Check for error messages in output
-          if (output.error) {
-            throw new Error(`MiniMax error: ${output.error}`);
-          }
-
-          // Check for empty images array
-          if (output.images && output.images.length === 0) {
-            throw new Error(
-              'MiniMax returned empty images array. This may be due to NSFW content being filtered.'
-            );
-          }
         }
       }
 

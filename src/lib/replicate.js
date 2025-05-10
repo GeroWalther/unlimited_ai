@@ -21,9 +21,6 @@ const MODELS = {
   // Flux Schnell is fast and reliable - the recommended model from Replicate docs
   FLUX_SCHNELL: 'black-forest-labs/flux-schnell',
 
-  // MiniMax Image-01 is also working reliably
-  MINIMAX: 'minimax/image-01',
-
   // Using full version IDs for models that require payment or special access
   STICKER_MAKER:
     'fofr/sticker-maker:4acb778eb059772225ec213948f0660867b2e03f277448f18cf1800b96a65a1a',
@@ -32,8 +29,9 @@ const MODELS = {
   PROTEUS:
     'datacte/proteus-v0.3:b28b79d725c8548b173b6a19ff9bffd16b9b80df5b18b8dc5cb9e1ee471bfa48',
 
-  // Adding Stable Diffusion 3.5 Large - using the official model ID without version
-  SD_3_5: 'stability-ai/stable-diffusion-3.5-large',
+  // Babes-XL for high-quality NSFW photorealism
+  BABES_XL:
+    'asiryan/babes-sdxl:a07fcbe80652ccf989e8198654740d7d562de85f573196dd624a8a80285da27d',
 };
 
 /**
@@ -46,14 +44,6 @@ export const MODEL_CONFIGS = {
     defaultGuidance: 7.5,
     description:
       'Ultra-fast model generating images in 1-2 seconds - reliable for NSFW content',
-    nsfw_optimized: true,
-  },
-  'minimax/image-01': {
-    defaultSteps: 25,
-    maxSteps: 40,
-    defaultGuidance: 7.0,
-    description:
-      'High-quality versatile model with excellent character reference support',
     nsfw_optimized: true,
   },
   'fofr/sticker-maker:4acb778eb059772225ec213948f0660867b2e03f277448f18cf1800b96a65a1a':
@@ -74,14 +64,15 @@ export const MODEL_CONFIGS = {
         'Specialized in anime art with enhanced lighting effects - trained on 200,000+ anime images',
       nsfw_optimized: true,
     },
-  'stability-ai/stable-diffusion-3.5-large': {
-    defaultSteps: 30,
-    maxSteps: 50,
-    defaultGuidance: 7.5,
-    description:
-      'High-quality model with fine details, supports various styles, and produces diverse outputs',
-    nsfw_optimized: true,
-  },
+  'asiryan/babes-sdxl:a07fcbe80652ccf989e8198654740d7d562de85f573196dd624a8a80285da27d':
+    {
+      defaultSteps: 40,
+      maxSteps: 50,
+      defaultGuidance: 3.5,
+      description:
+        'High-quality photorealistic NSFW model with excellent figure details and lighting (2025)',
+      nsfw_optimized: true,
+    },
 };
 
 /**
@@ -174,31 +165,26 @@ export async function runReplicateImageGeneration(prompt, options = {}) {
 
       console.log('Proteus parameters:', JSON.stringify(modelInputs, null, 2));
     }
-    // SD 3.5 Turbo model - fixed for 422 errors
-    else if (modelId.includes('stable-diffusion-3.5')) {
+    // Babes-XL model
+    else if (modelId.includes('babes-sdxl')) {
       modelInputs = {
         prompt:
-          prompt + ', photo, photography, artistic photograph, high quality', // Add artistic keywords
+          'artistic photography, ' +
+          prompt +
+          ', high quality, detailed, 8k ultra HD',
         negative_prompt:
           mergedOptions.negativePrompt +
-          ', censored, censorship, blur, blurry, low quality, cropped, worst quality', // Enhanced negative prompt
+          ', censored, censorship, blurred, blur',
         width: Math.min(mergedOptions.width, 1024),
         height: Math.min(mergedOptions.height, 1024),
         num_inference_steps: mergedOptions.numSteps,
         guidance_scale: mergedOptions.guidanceScale,
-        // Enhanced NSFW settings for SD 3.5
-        apply_watermark: false,
-        high_noise_frac: 0.8,
+        scheduler: 'K_EULER_ANCESTRAL', // Default scheduler for this model
+        num_outputs: 1,
         disable_safety_checker: true,
-        safety_checker: 'none', // Use literal "none" value
-        allow_nsfw: true,
-        nsfw_allowed: true,
-        nsfw: true,
-        remove_safety: true,
-        safety_guidance_scale: 0, // Set to 0 to ignore safety guidance
       };
 
-      console.log('SD 3.5 parameters:', JSON.stringify(modelInputs, null, 2));
+      console.log('Babes-XL parameters:', JSON.stringify(modelInputs, null, 2));
     }
     // Generic parameters for other versioned models
     else {
@@ -247,54 +233,6 @@ export async function runReplicateImageGeneration(prompt, options = {}) {
     // Log parameters for debugging
     console.log('FLUX parameters:', JSON.stringify(modelInputs, null, 2));
   }
-  // MiniMax Image-01 model - reverted to original working version
-  else if (mergedOptions.modelName.includes('minimax/image-01')) {
-    modelInputs = {
-      prompt: prompt + ', artistic photo', // Add keywords that make content appear more artistic
-      negative_prompt:
-        mergedOptions.negativePrompt + ', censored, censorship, black bars', // Add censorship to negative prompt
-      width: Math.min(mergedOptions.width, 1024), // MiniMax has a 1024x1024 maximum
-      height: Math.min(mergedOptions.height, 1024),
-      seed: Math.floor(Math.random() * 1000000), // Random seed helps with variation
-      steps: mergedOptions.numSteps,
-      cfg_scale: mergedOptions.guidanceScale,
-      nsfw: true, // Original parameter
-      safety_checker: false, // Try to bypass safety checker
-      guidance_safety_scale: 0, // Set safety guidance to 0
-      allow_nsfw: true, // Add explicit NSFW permission
-      remove_safety: true, // Try additional parameter
-      disable_safety_checker: true, // Add standard parameter
-    };
-
-    // Log parameters for debugging
-    console.log('MiniMax parameters:', JSON.stringify(modelInputs, null, 2));
-  }
-  // Stable Diffusion 3.5 model
-  else if (mergedOptions.modelName.includes('stable-diffusion-3.5')) {
-    modelInputs = {
-      prompt:
-        prompt + ', photo, photography, artistic photograph, high quality', // Add artistic keywords
-      negative_prompt:
-        mergedOptions.negativePrompt +
-        ', clothing, censored, censorship, blur, blurry, low quality, cropped, worst quality', // Add clothing to negative prompt
-      width: Math.min(mergedOptions.width, 1024),
-      height: Math.min(mergedOptions.height, 1024),
-      num_inference_steps: mergedOptions.numSteps,
-      guidance_scale: mergedOptions.guidanceScale,
-      // Enhanced NSFW settings for SD 3.5
-      apply_watermark: false,
-      high_noise_frac: 0.8,
-      disable_safety_checker: true,
-      safety_checker: 'none', // Use literal "none" value
-      allow_nsfw: true,
-      nsfw_allowed: true,
-      nsfw: true,
-      remove_safety: true,
-      safety_guidance_scale: 0, // Set to 0 to ignore safety guidance
-    };
-
-    console.log('SD 3.5 parameters:', JSON.stringify(modelInputs, null, 2));
-  }
   // Default fallback for any other model
   else {
     modelInputs = {
@@ -306,6 +244,8 @@ export async function runReplicateImageGeneration(prompt, options = {}) {
       negative_prompt: mergedOptions.negativePrompt,
       disable_safety_checker: true,
       nsfw_filter: false, // Always disable NSFW filter
+      allow_nsfw: true, // Always try to allow NSFW
+      nsfw: true, // Explicit NSFW flag for models that support it
     };
   }
 

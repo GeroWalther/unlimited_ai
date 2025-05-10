@@ -39,7 +39,21 @@ export async function generateImage(params) {
           `Model "${data.modelName}" not found. Please try Flux Schnell instead.`
         );
       } else if (res.status === 422 && data.modelName) {
-        throw new Error(`Invalid parameters for model "${data.modelName}".`);
+        if (
+          data.error &&
+          (data.error.includes('NSFW content') ||
+            data.error.includes('flagged as sensitive'))
+        ) {
+          // NSFW content detection error
+          throw new Error(
+            `"${data.modelName}" detected sensitive content. For NSFW content: 1) Use FLUX Schnell model 2) Use "artistic photography" in your prompt 3) Avoid explicit terms`
+          );
+        } else {
+          // Standard parameter error
+          throw new Error(
+            `Invalid parameters for model "${data.modelName}". Try Flux Schnell which handles NSFW content reliably.`
+          );
+        }
       }
       // Generic error
       throw new Error(data.error || 'Unknown error');
@@ -55,9 +69,7 @@ export async function generateImage(params) {
     return data.image_url;
   } catch (error) {
     console.error('Generate image error:', error);
-    throw new Error(
-      `${error.message} Please try using the Flux Schnell model which is the most reliable option.`
-    );
+    throw error;
   }
 }
 
@@ -89,14 +101,12 @@ export default function ImageTab() {
     switch (modelId) {
       case 'flux-schnell':
         return 'black-forest-labs/flux-schnell';
-      case 'minimax':
-        return 'minimax/image-01';
       case 'sticker-maker':
         return 'fofr/sticker-maker:4acb778eb059772225ec213948f0660867b2e03f277448f18cf1800b96a65a1a';
       case 'proteus':
         return 'datacte/proteus-v0.3:b28b79d725c8548b173b6a19ff9bffd16b9b80df5b18b8dc5cb9e1ee471bfa48';
-      case 'sd-3.5':
-        return 'stability-ai/stable-diffusion-3.5-large';
+      case 'babes-xl':
+        return 'asiryan/babes-sdxl:a07fcbe80652ccf989e8198654740d7d562de85f573196dd624a8a80285da27d';
       default:
         return 'black-forest-labs/flux-schnell';
     }
@@ -188,16 +198,10 @@ export default function ImageTab() {
         'Ultra-fast generation (1-2s) with good quality - reliable for NSFW content',
     },
     {
-      id: 'minimax',
-      name: 'MiniMax Image',
+      id: 'babes-xl',
+      name: 'Babes-XL (2025)',
       description:
-        'High-quality model with excellent character reference support',
-    },
-    {
-      id: 'sticker-maker',
-      name: 'Sticker Maker',
-      description:
-        'Creates graphics with transparent backgrounds - perfect for stickers and icons',
+        'High-quality photorealistic NSFW model with excellent figure details and lighting',
     },
     {
       id: 'proteus',
@@ -206,10 +210,10 @@ export default function ImageTab() {
         'Specialized in anime art with enhanced lighting - use 30+ steps for best quality',
     },
     {
-      id: 'sd-3.5',
-      name: 'Stable Diffusion 3.5',
+      id: 'sticker-maker',
+      name: 'Sticker Maker',
       description:
-        'High-quality model with fine details and excellent prompt understanding',
+        'Creates graphics with transparent backgrounds - perfect for stickers and icons',
     },
   ];
 
@@ -256,7 +260,7 @@ export default function ImageTab() {
             <Link
               href='/artistic-guidelines'
               className='mt-1 inline-block text-pink-400 hover:text-pink-300 underline'>
-              Read our full guidelines →
+              Read our guidelines →
             </Link>
           </p>
         </div>
