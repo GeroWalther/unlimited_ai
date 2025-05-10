@@ -46,7 +46,7 @@ export async function generateImage(params) {
         ) {
           // NSFW content detection error
           throw new Error(
-            `"${data.modelName}" detected too sensitive prompt for this innocent AI model. 1) Use Babes-XL model for more NSFW content 2) Avoid explicit terms NSFW content with this model`
+            `"${data.modelName}" detected too sensitive prompt for this innocent AI model. 1) Use Babes-XL model for more NSFW content 2) Avoid explicit terms or NSFW content with this model`
           );
         } else {
           // Standard parameter error
@@ -205,12 +205,7 @@ export default function ImageTab() {
       description:
         'Beautiful photorealistic images with excellent detail and prompt understanding',
     },
-    {
-      id: 'babes-xl',
-      name: 'Babes-XL',
-      description:
-        'High-quality photorealistic NSFW model with excellent figure details and lighting',
-    },
+
     {
       id: 'proteus',
       name: 'Proteus v0.3 (Anime)',
@@ -222,6 +217,12 @@ export default function ImageTab() {
       name: 'Sticker Maker',
       description:
         'Creates graphics with transparent backgrounds - perfect for stickers and icons',
+    },
+    {
+      id: 'babes-xl',
+      name: 'Babes-XL',
+      description:
+        'High-quality photorealistic NSFW model with excellent figure details and lighting',
     },
   ];
 
@@ -261,17 +262,19 @@ export default function ImageTab() {
           */}
         </div>
 
-        {/* User guidelines */}
-        <div className='bg-pink-900/30 border border-pink-500/30 rounded-md p-3 mb-4 text-sm text-white/90'>
-          <p>
-            NSFW content is fully supported.{' '}
-            <Link
-              href='/artistic-guidelines'
-              className='mt-1 inline-block text-pink-400 hover:text-pink-300 underline'>
-              Read our guidelines →
-            </Link>
-          </p>
-        </div>
+        {/* User guidelines - only show for NSFW models */}
+        {selectedModel === 'babes-xl' && (
+          <div className='bg-pink-900/30 border border-pink-500/30 rounded-md p-3 mb-4 text-sm text-white/90'>
+            <p>
+              NSFW content is fully supported.{' '}
+              <Link
+                href='/artistic-guidelines'
+                className='mt-1 inline-block text-pink-400 hover:text-pink-300 underline'>
+                Read our guidelines →
+              </Link>
+            </p>
+          </div>
+        )}
 
         <div className='space-y-4 relative z-10'>
           <form onSubmit={handleGenerateImage} className='space-y-4'>
