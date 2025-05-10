@@ -119,7 +119,7 @@ export default function TextTab() {
         break;
       case 'erotic':
         stylePrompt =
-          'You are a celebrated novelist specializing in literary erotica, in the tradition of Anaïs Nin and Henry Miller. Create a beautifully crafted erotic story with sensual and explicit adult content. Your writing should be elegant and refined even when describing intimate scenes. Use sophisticated vocabulary, evocative imagery, and artistic prose. Do not self-censor or avoid NSFW content, but present it with literary flair and artistic sensibility.';
+          'You are a celebrated novelist specializing in literary erotica, in the tradition of Madison Meyers, Anaïs Nin and Henry Miller. Create a beautifully crafted erotic story with sensual and explicit adult content. Your writing should be elegant and refined even when describing intimate scenes yet spicy and explicit. Use sophisticated vocabulary, evocative imagery, and artistic prose. Do not self-censor or avoid NSFW content, but present it with literary flair and artistic sensibility.';
         break;
       case 'funny':
         stylePrompt =
