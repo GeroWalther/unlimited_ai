@@ -45,6 +45,22 @@ export async function POST(req) {
       case 'minimax':
         modelName = 'minimax/image-01';
         break;
+      case 'sticker-maker':
+        modelName =
+          'fofr/sticker-maker:4acb778eb059772225ec213948f0660867b2e03f277448f18cf1800b96a65a1a';
+        break;
+      case 'recraft':
+        modelName =
+          'recraft-ai/recraft-v3:00d0868ae04f3a6e8bd152f81b191d0c16562c3a39a878c2a074623bfd06f7d7';
+        break;
+      case 'proteus':
+        modelName =
+          'datacte/proteus-v0.3:b28b79d725c8548b173b6a19ff9bffd16b9b80df5b18b8dc5cb9e1ee471bfa48';
+        break;
+      case 'sd-turbo':
+        modelName =
+          'stability-ai/stable-diffusion-3.5-large-turbo:c76327772f9c49cbd5b8f4dbddad19f05a6e8c7b8103b87b509180cfbecf4626';
+        break;
       default:
         // Default to FLUX Schnell which is officially supported and reliable
         console.log(`Unsupported model ${model}, using FLUX Schnell instead`);
@@ -136,6 +152,19 @@ export async function POST(req) {
       ) {
         return NextResponse.json({
           image_url: output[0],
+          status: 'completed',
+          model: model,
+          nsfw_allowed: allowNsfw,
+        });
+      }
+
+      // Special handling for Sticker Maker which returns an array of images
+      if (Array.isArray(output) && model === 'sticker-maker') {
+        console.log('Sticker Maker detected, returning first image from array');
+        // Return the first image in the array
+        return NextResponse.json({
+          image_url: output[0],
+          all_images: output, // Include all images in case the client wants to use them
           status: 'completed',
           model: model,
           nsfw_allowed: allowNsfw,

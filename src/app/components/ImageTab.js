@@ -198,14 +198,39 @@ export default function ImageTab() {
   const AVAILABLE_MODELS = [
     {
       id: 'flux-schnell',
-      name: 'FLUX Schnell ',
+      name: 'FLUX Schnell',
       description:
-        'Fast, reliable model with NSFW support - good for quick generation',
+        'Ultra-fast generation (1-2s) with good quality - reliable for NSFW content',
     },
     {
       id: 'minimax',
       name: 'MiniMax Image',
-      description: 'High-quality with character reference support',
+      description:
+        'High-quality model with excellent character reference support',
+    },
+    {
+      id: 'sticker-maker',
+      name: 'Sticker Maker',
+      description:
+        'Creates graphics with transparent backgrounds - perfect for stickers and icons',
+    },
+    {
+      id: 'recraft',
+      name: 'Recraft V3',
+      description:
+        'State-of-the-art model with excellent text generation in images and superior designs',
+    },
+    {
+      id: 'proteus',
+      name: 'Proteus v0.3 (Anime)',
+      description:
+        'Specialized in anime art with enhanced lighting effects - uses 200k+ anime images',
+    },
+    {
+      id: 'sd-turbo',
+      name: 'SD 3.5 Turbo',
+      description:
+        'Fast high-quality model with fine details and diverse artistic styles',
     },
   ];
 
