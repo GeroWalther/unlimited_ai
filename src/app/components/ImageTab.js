@@ -199,7 +199,7 @@ export default function ImageTab() {
     },
     {
       id: 'babes-xl',
-      name: 'Babes-XL (2025)',
+      name: 'Babes-XL',
       description:
         'High-quality photorealistic NSFW model with excellent figure details and lighting',
     },
