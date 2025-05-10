@@ -39,9 +39,7 @@ export async function generateImage(params) {
           `Model "${data.modelName}" not found. Please try Flux Schnell instead.`
         );
       } else if (res.status === 422 && data.modelName) {
-        throw new Error(
-          `Invalid parameters for model "${data.modelName}". Try using Flux Schnell which is more reliable.`
-        );
+        throw new Error(`Invalid parameters for model "${data.modelName}".`);
       }
       // Generic error
       throw new Error(data.error || 'Unknown error');
@@ -75,60 +73,57 @@ export default function ImageTab() {
   const [selectedModel, setSelectedModel] = useState('flux-schnell');
   const [width, setWidth] = useState(768);
   const [height, setHeight] = useState(1024);
-  const [steps, setSteps] = useState(4);
-  const [guidance, setGuidance] = useState(7.5);
-  // const [styleOption, setStyleOption] = useState('realistic_image');
-  // const [showStyleInfo, setShowStyleInfo] = useState(false);
 
-  // Available styles for the Ideogram model - no longer used
-  const IDEOGRAM_STYLES = [];
+  const defaultModelKey = 'black-forest-labs/flux-schnell';
+  const defaultConfig = MODEL_CONFIGS[defaultModelKey];
 
-  // Comment out NSFW localStorage logic - no longer needed
-  /*
-  useEffect(() => {
-    const savedNsfwMode = localStorage.getItem('nsfwMode');
-    if (savedNsfwMode !== null) {
-      setNsfwMode(savedNsfwMode === 'true');
+  const [steps, setSteps] = useState(defaultConfig?.defaultSteps || 4);
+  const [guidance, setGuidance] = useState(
+    defaultConfig?.defaultGuidance || 7.5
+  );
+  // Remove style options for Recraft
+  const [showStyleSelector, setShowStyleSelector] = useState(false);
+
+  // Helper function to get the full model name based on the selected model ID
+  const getModelConfigKey = (modelId) => {
+    switch (modelId) {
+      case 'flux-schnell':
+        return 'black-forest-labs/flux-schnell';
+      case 'minimax':
+        return 'minimax/image-01';
+      case 'sticker-maker':
+        return 'fofr/sticker-maker:4acb778eb059772225ec213948f0660867b2e03f277448f18cf1800b96a65a1a';
+      case 'proteus':
+        return 'datacte/proteus-v0.3:b28b79d725c8548b173b6a19ff9bffd16b9b80df5b18b8dc5cb9e1ee471bfa48';
+      case 'sd-3.5':
+        return 'stability-ai/stable-diffusion-3.5-large';
+      default:
+        return 'black-forest-labs/flux-schnell';
     }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('nsfwMode', nsfwMode.toString());
-    
-    if (nsfwMode) {
-      if (selectedModel !== 'flux-schnell') {
-        setSelectedModel('flux-schnell');
-        console.log('Switched to Flux Schnell for NSFW content');
-      }
-    }
-  }, [nsfwMode, selectedModel]);
-
-  useEffect(() => {
-    if (!nsfwMode) {
-      if (!negativePrompt.includes('nudity')) {
-        setNegativePrompt(
-          (prev) =>
-            `${prev}, nudity, naked, nude, sexual, explicit content, nsfw`
-        );
-      }
-    } else {
-      setNegativePrompt((prev) =>
-        prev.replace(
-          /, nudity, naked, nude, sexual, explicit content, nsfw/g,
-          ''
-        )
-      );
-    }
-  }, [nsfwMode]);
-  */
+  };
 
   // Update steps and guidance based on model selection
   useEffect(() => {
-    const config = MODEL_CONFIGS[selectedModel];
+    const modelConfigKey = getModelConfigKey(selectedModel);
+    const config = MODEL_CONFIGS[modelConfigKey];
+
     if (config) {
+      console.log(
+        `Updating UI for model: ${selectedModel} (${modelConfigKey})`
+      );
+      console.log(
+        `Setting steps to ${config.defaultSteps}, guidance to ${config.defaultGuidance}`
+      );
       setSteps(config.defaultSteps);
       setGuidance(config.defaultGuidance);
+    } else {
+      console.warn(
+        `No config found for model: ${selectedModel} (${modelConfigKey})`
+      );
     }
+
+    // We don't need to show style selector anymore since Recraft is removed
+    setShowStyleSelector(false);
   }, [selectedModel]);
 
   // Image generation mutation
@@ -157,18 +152,8 @@ export default function ImageTab() {
       steps,
       guidance,
       negativePrompt,
-      allowNsfw: true, // Always allow NSFW since the entire app is NSFW
+      allowNsfw: true, // Always allow NSFW content
     };
-
-    // Add style specific to Recraft model
-    if (selectedModel === 'recraft') {
-      params.style = styleOption;
-    }
-
-    // Add style specific to Ideogram model
-    if (selectedModel === 'ideogram') {
-      params.style_type = styleOption;
-    }
 
     imageMutation.mutate(params);
   }
@@ -215,22 +200,16 @@ export default function ImageTab() {
         'Creates graphics with transparent backgrounds - perfect for stickers and icons',
     },
     {
-      id: 'recraft',
-      name: 'Recraft V3',
-      description:
-        'State-of-the-art model with excellent text generation in images and superior designs',
-    },
-    {
       id: 'proteus',
       name: 'Proteus v0.3 (Anime)',
       description:
-        'Specialized in anime art with enhanced lighting effects - uses 200k+ anime images',
+        'Specialized in anime art with enhanced lighting - use 30+ steps for best quality',
     },
     {
-      id: 'sd-turbo',
-      name: 'SD 3.5 Turbo',
+      id: 'sd-3.5',
+      name: 'Stable Diffusion 3.5',
       description:
-        'Fast high-quality model with fine details and diverse artistic styles',
+        'High-quality model with fine details and excellent prompt understanding',
     },
   ];
 
@@ -273,11 +252,11 @@ export default function ImageTab() {
         {/* User guidelines */}
         <div className='bg-pink-900/30 border border-pink-500/30 rounded-md p-3 mb-4 text-sm text-white/90'>
           <p>
-            NSFW content is fully supported.
+            NSFW content is fully supported.{' '}
             <Link
               href='/artistic-guidelines'
-              className='ml-2 text-pink-400 hover:text-pink-300 underline'>
-              Read our guidelines →
+              className='mt-1 inline-block text-pink-400 hover:text-pink-300 underline'>
+              Read our full guidelines →
             </Link>
           </p>
         </div>
@@ -334,8 +313,6 @@ export default function ImageTab() {
             {/* Advanced options panel */}
             {showAdvanced && (
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 border border-white/10 rounded-md p-4 bg-black/30'>
-                {/* Style selection was removed as we now focus on models without style options */}
-
                 {/* Negative prompt */}
                 <div className='sm:col-span-2'>
                   <label className='text-sm text-white/70 block mb-1'>
@@ -389,17 +366,32 @@ export default function ImageTab() {
                   <label className='text-sm text-white/70 block mb-1'>
                     Steps ({steps})
                   </label>
+                  {/* Debug info
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className='text-xs text-pink-400 mb-1'>
+                      Model: {selectedModel}, Config Key:{' '}
+                      {getModelConfigKey(selectedModel)}, Max Steps:{' '}
+                      {MODEL_CONFIGS[getModelConfigKey(selectedModel)]
+                        ?.maxSteps || 'not found'}
+                    </div>
+                  )} */}
                   <input
                     type='range'
                     value={steps}
                     onChange={handleNumberChange(setSteps)}
                     min={1}
-                    max={MODEL_CONFIGS[selectedModel]?.maxSteps || 30}
+                    max={
+                      MODEL_CONFIGS[getModelConfigKey(selectedModel)]
+                        ?.maxSteps || 30
+                    }
                     step={1}
                     className='w-full'
                   />
                   <p className='text-xs text-white/50'>
-                    Higher = better quality but slower
+                    Higher = better quality but slower (Max:{' '}
+                    {MODEL_CONFIGS[getModelConfigKey(selectedModel)]
+                      ?.maxSteps || 30}
+                    )
                   </p>
                 </div>
 

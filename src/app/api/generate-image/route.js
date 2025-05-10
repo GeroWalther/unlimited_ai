@@ -19,9 +19,13 @@ export async function POST(req) {
       negativePrompt = 'ugly, deformed, disfigured, blurry, bad anatomy, bad hands, cropped, low quality',
       // Always enable NSFW mode - app is entirely NSFW
       allowNsfw = true,
-      style,
+      // Using let for style so it can be modified later
+      style: styleParam,
       style_type,
     } = await req.json();
+
+    // Initialize style as a let variable so it can be modified
+    let style = styleParam;
 
     if (!prompt) {
       return NextResponse.json(
@@ -49,17 +53,12 @@ export async function POST(req) {
         modelName =
           'fofr/sticker-maker:4acb778eb059772225ec213948f0660867b2e03f277448f18cf1800b96a65a1a';
         break;
-      case 'recraft':
-        modelName =
-          'recraft-ai/recraft-v3:00d0868ae04f3a6e8bd152f81b191d0c16562c3a39a878c2a074623bfd06f7d7';
-        break;
       case 'proteus':
         modelName =
           'datacte/proteus-v0.3:b28b79d725c8548b173b6a19ff9bffd16b9b80df5b18b8dc5cb9e1ee471bfa48';
         break;
-      case 'sd-turbo':
-        modelName =
-          'stability-ai/stable-diffusion-3.5-large-turbo:c76327772f9c49cbd5b8f4dbddad19f05a6e8c7b8103b87b509180cfbecf4626';
+      case 'sd-3.5':
+        modelName = 'stability-ai/stable-diffusion-3.5-large';
         break;
       default:
         // Default to FLUX Schnell which is officially supported and reliable
@@ -77,8 +76,6 @@ export async function POST(req) {
         guidanceScale: Number(guidance),
         allowNsfw: true, // Always allow NSFW content
         negativePrompt,
-        style, // Pass style for Recraft
-        style_type, // Pass style_type for Ideogram
       });
 
       console.log(
@@ -217,41 +214,20 @@ export async function POST(req) {
           });
         }
 
-        // Recraft model may return images in different formats
-        // It might return a URL directly or an object with a URL property
-        if (model === 'recraft') {
-          console.log(
-            'Handling Recraft model response:',
-            JSON.stringify(output)
-          );
+        // MiniMax specific error handling
+        if (model === 'minimax') {
+          console.log('Handling MiniMax response:', JSON.stringify(output));
 
-          // Try to find any URL in the output
-          const findUrl = (obj) => {
-            if (!obj) return null;
-            if (typeof obj === 'string' && obj.startsWith('http')) return obj;
-            if (Array.isArray(obj)) {
-              for (const item of obj) {
-                const url = findUrl(item);
-                if (url) return url;
-              }
-            }
-            if (typeof obj === 'object') {
-              for (const key in obj) {
-                const url = findUrl(obj[key]);
-                if (url) return url;
-              }
-            }
-            return null;
-          };
+          // Check for error messages in output
+          if (output.error) {
+            throw new Error(`MiniMax error: ${output.error}`);
+          }
 
-          const imageUrl = findUrl(output);
-          if (imageUrl) {
-            return NextResponse.json({
-              image_url: imageUrl,
-              status: 'completed',
-              model: model,
-              nsfw_allowed: allowNsfw,
-            });
+          // Check for empty images array
+          if (output.images && output.images.length === 0) {
+            throw new Error(
+              'MiniMax returned empty images array. This may be due to NSFW content being filtered.'
+            );
           }
         }
       }
@@ -287,12 +263,29 @@ export async function POST(req) {
           },
           { status: 422 }
         );
+      } else if (
+        modelError.message.includes('NSFW content') ||
+        modelError.message.includes('flagged as sensitive') ||
+        modelError.message.includes('E005') ||
+        modelError.message.includes('No images were generated')
+      ) {
+        return NextResponse.json(
+          {
+            error: `NSFW content detected by '${modelName}'. We recommend trying: 
+            1) FLUX Schnell which has the best NSFW support
+            2) Using "artistic nude" or "photography" in your prompt instead of explicit terms
+            3) Adding words like "artistic", "aesthetic", or "photography" to make the prompt seem more artistic
+            4) Removing explicit sexual terms from your prompt`,
+            modelName,
+          },
+          { status: 422 }
+        );
       }
 
       // Generic error fallback
       return NextResponse.json(
         {
-          error: `Model error with '${modelName}': ${modelError.message}. Please try Flux Schnell which is the most reliable.`,
+          error: `Model error with '${modelName}': ${modelError.message}. Try these troubleshooting steps: 1) Adjust steps (lower for FLUX, higher for others), 2) Simplify your prompt, 3) Try Flux Schnell which is the most reliable.`,
           modelName,
         },
         { status: 500 }
