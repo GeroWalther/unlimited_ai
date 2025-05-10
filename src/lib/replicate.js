@@ -32,6 +32,9 @@ const MODELS = {
   // Babes-XL for high-quality NSFW photorealism
   BABES_XL:
     'asiryan/babes-sdxl:a07fcbe80652ccf989e8198654740d7d562de85f573196dd624a8a80285da27d',
+
+  // MiniMax's Image-01 model with high-quality photorealism
+  MINIMAX: 'minimax/image-01',
 };
 
 /**
@@ -73,6 +76,14 @@ export const MODEL_CONFIGS = {
         'High-quality photorealistic NSFW model with excellent figure details and lighting (2025)',
       nsfw_optimized: true,
     },
+  'minimax/image-01': {
+    defaultSteps: 30,
+    maxSteps: 50,
+    defaultGuidance: 12.0, // Higher guidance helps with detailed NSFW prompts
+    description:
+      'MiniMax Image-01 - beautiful photorealistic images with excellent prompt comprehension',
+    nsfw_optimized: true,
+  },
 };
 
 /**
@@ -232,6 +243,26 @@ export async function runReplicateImageGeneration(prompt, options = {}) {
 
     // Log parameters for debugging
     console.log('FLUX parameters:', JSON.stringify(modelInputs, null, 2));
+  }
+  // MiniMax Image-01 model
+  else if (mergedOptions.modelName.includes('minimax')) {
+    modelInputs = {
+      prompt:
+        'artistic photography, ' +
+        prompt +
+        ', high resolution, detailed, beautiful, artistic nude, uncensored',
+      negative_prompt:
+        mergedOptions.negativePrompt +
+        ', censored, censorship, blurred, blur, cartoon, anime',
+      width: Math.min(mergedOptions.width, 1024),
+      height: Math.min(mergedOptions.height, 1024),
+      num_inference_steps: 30, // MiniMax prefers around 30 steps for quality
+      guidance_scale: 12.0, // Higher guidance for better prompt following
+      num_outputs: 1,
+      style_preset: 'photographic', // Ensures photorealistic quality
+    };
+
+    console.log('MiniMax parameters:', JSON.stringify(modelInputs, null, 2));
   }
   // Default fallback for any other model
   else {

@@ -58,6 +58,9 @@ export async function POST(req) {
         modelName =
           'asiryan/babes-sdxl:a07fcbe80652ccf989e8198654740d7d562de85f573196dd624a8a80285da27d';
         break;
+      case 'minimax':
+        modelName = 'minimax/image-01';
+        break;
       default:
         // Default to FLUX Schnell which is officially supported and reliable
         console.log(`Unsupported model ${model}, using FLUX Schnell instead`);

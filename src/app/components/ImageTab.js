@@ -46,7 +46,7 @@ export async function generateImage(params) {
         ) {
           // NSFW content detection error
           throw new Error(
-            `"${data.modelName}" detected sensitive content. For NSFW content: 1) Use FLUX Schnell model 2) Use "artistic photography" in your prompt 3) Avoid explicit terms`
+            `"${data.modelName}" detected too sensitive prompt for this innocent AI model. 1) Use Babes-XL model for more NSFW content 2) Avoid explicit terms NSFW content with this model`
           );
         } else {
           // Standard parameter error
@@ -107,6 +107,8 @@ export default function ImageTab() {
         return 'datacte/proteus-v0.3:b28b79d725c8548b173b6a19ff9bffd16b9b80df5b18b8dc5cb9e1ee471bfa48';
       case 'babes-xl':
         return 'asiryan/babes-sdxl:a07fcbe80652ccf989e8198654740d7d562de85f573196dd624a8a80285da27d';
+      case 'minimax':
+        return 'minimax/image-01';
       default:
         return 'black-forest-labs/flux-schnell';
     }
@@ -195,7 +197,13 @@ export default function ImageTab() {
       id: 'flux-schnell',
       name: 'FLUX Schnell',
       description:
-        'Ultra-fast generation (1-2s) with good quality - reliable for NSFW content',
+        'Ultra-fast generation (1-2s) with decent quality - reliable for NSFW content',
+    },
+    {
+      id: 'minimax',
+      name: 'MiniMax',
+      description:
+        'Beautiful photorealistic images with excellent detail and prompt understanding',
     },
     {
       id: 'babes-xl',
