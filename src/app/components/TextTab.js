@@ -21,7 +21,7 @@ export default function TextTab() {
   const [storyType, setStoryType] = useState('any');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
-  const [maxTokens, setMaxTokens] = useState(1000);
+  const [maxTokens, setMaxTokens] = useState(300);
 
   // Models available for text generation
   const AVAILABLE_MODELS = [
@@ -381,7 +381,7 @@ IMPORTANT: Always complete your story with a proper, satisfying ending. Never le
                   type='range'
                   value={maxTokens}
                   onChange={(e) => setMaxTokens(parseInt(e.target.value))}
-                  min={500}
+                  min={200}
                   max={2000}
                   step={100}
                   className='w-full'
