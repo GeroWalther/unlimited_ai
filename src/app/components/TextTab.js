@@ -21,16 +21,16 @@ export default function TextTab() {
   const [storyType, setStoryType] = useState('any');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [temperature, setTemperature] = useState(0.7);
-  const [maxTokens, setMaxTokens] = useState(300);
+  const [maxTokens, setMaxTokens] = useState(1200);
 
   // Models available for text generation
   const AVAILABLE_MODELS = [
     {
       id: 'claude-sonnet',
-      name: 'Claude 3.5 Sonnet',
+      name: 'Claude 3.7 Sonnet',
       description:
         'Most powerful model for creative writing with multilingual support',
-      apiPath: 'anthropic/claude-3.5-sonnet',
+      apiPath: 'anthropic/claude-3.7-sonnet',
     },
   ];
 
@@ -288,9 +288,9 @@ export default function TextTab() {
                   type='range'
                   value={maxTokens}
                   onChange={(e) => setMaxTokens(parseInt(e.target.value))}
-                  min={200}
-                  max={2000}
-                  step={100}
+                  min={1200}
+                  max={5000}
+                  step={200}
                   className='w-full'
                 />
                 <p className='text-xs text-white/50'>
