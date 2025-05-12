@@ -120,6 +120,59 @@ export async function POST(request) {
         });
         result = response;
         // add new model here else if
+      } else if (model === 'sao10k-euryale-70b') {
+        try {
+          // Use OpenRouter API to access the Sao10K model
+          const openRouterKey = process.env.OPENROUTERAI_KEY;
+
+          // Prepare the request to OpenRouter
+          const response = await fetch(
+            'https://openrouter.ai/api/v1/chat/completions',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${openRouterKey}`,
+                'HTTP-Referer': 'https://gw-intech.com', // Replace with your actual domain
+                'X-Title': 'Unlimited AI Text Generator',
+              },
+              body: JSON.stringify({
+                model: 'sao10k/l3.3-euryale-70b', // Specific model ID for OpenRouter
+                messages: [
+                  {
+                    role: 'system',
+                    content: finalPrompt,
+                  },
+                  {
+                    role: 'user',
+                    content: finalTextPrompt,
+                  },
+                ],
+                temperature: temperature || 0.7,
+                max_tokens: maxTokens || 1500,
+                top_p: 0.9,
+                stream: false,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('OpenRouter API error:', errorData);
+            throw new Error(
+              `OpenRouter API responded with status: ${
+                response.status
+              } - ${JSON.stringify(errorData)}`
+            );
+          }
+
+          const data = await response.json();
+          result = data.choices[0].message.content;
+          console.log('OpenRouter generation successful');
+        } catch (error) {
+          console.error('Error with OpenRouter:', error);
+          throw new Error(`Error with OpenRouter: ${error.message}`);
+        }
       } else {
         // Fallback to Claude as default
         const response = await replicate.run('anthropic/claude-3.7-sonnet', {

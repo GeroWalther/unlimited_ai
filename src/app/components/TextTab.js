@@ -32,6 +32,13 @@ export default function TextTab() {
         'Most powerful model for creative writing with multilingual support',
       apiPath: 'anthropic/claude-3.7-sonnet',
     },
+    {
+      id: 'sao10k-euryale-70b',
+      name: 'Sao10K Euryale 70B',
+      description:
+        'Advanced model for uncensored creative content with multilingual support',
+      apiPath: 'openrouter/sao10k-euryale-70b',
+    },
   ];
 
   // Languages supported for text generation
