@@ -8,9 +8,30 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'Unlimited AI',
+  title: 'VisionX AI',
   description:
-    'Unlimited AI - the AI platform for creating NSFW AI images, digital art. Novel covers, illustrations) character creation (OC, fantasy and more)',
+    'Create stunning NSFW AI images, digital art, novel covers, and character illustrations with VisionX AI. Generate immersive AI novels in multiple languages with our advanced AI writing platform.',
+  openGraph: {
+    title: 'VisionX AI',
+    description:
+      'Create stunning NSFW AI images, digital art, novel covers, and character illustrations with VisionX AI. Generate immersive AI novels in multiple languages with our advanced AI writing platform.',
+    images: [
+      {
+        url: '/ai-art.webp',
+        width: 1200,
+        height: 1200,
+        alt: 'VisionX AI',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VisionX AI',
+    description:
+      'Create stunning NSFW AI images, digital art, novels, and character illustrations with our advanced AI platform',
+    images: ['/ai-art.webp'],
+  },
 };
 
 export default function RootLayout({ children }) {
