@@ -120,10 +120,36 @@ export async function POST(request) {
         });
         result = response;
         // add new model here else if
-      } else if (model === 'sao10k-euryale-70b') {
+      } else if (
+        model === 'mancer-weaver' ||
+        model === 'mythomax-l2-13b' ||
+        model === 'ministral-8b' ||
+        model === 'shisa-v2-llama3' ||
+        model === 'sao10k-euryale-70b'
+      ) {
         try {
-          // Use OpenRouter API to access the Sao10K model
+          // Use OpenRouter API to access the requested model
           const openRouterKey = process.env.OPENROUTERAI_KEY;
+
+          // Map the frontend model ID to the correct OpenRouter API path
+          let openRouterModel;
+          switch (model) {
+            case 'mancer-weaver':
+              openRouterModel = 'mancer/weaver';
+              break;
+            case 'mythomax-l2-13b':
+              openRouterModel = 'gryphe/mythomax-l2-13b';
+              break;
+            case 'ministral-8b':
+              openRouterModel = 'mistral/ministral-8b';
+              break;
+            case 'shisa-v2-llama3':
+              openRouterModel = 'shisa-ai/shisa-v2-llama3.3-70b:free';
+              break;
+            case 'sao10k-euryale-70b':
+              openRouterModel = 'sao10k/l3.3-euryale-70b';
+              break;
+          }
 
           // Prepare the request to OpenRouter
           const response = await fetch(
@@ -133,11 +159,11 @@ export async function POST(request) {
               headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${openRouterKey}`,
-                'HTTP-Referer': 'https://gw-intech.com', // Replace with your actual domain
+                'HTTP-Referer': 'https://gw-intech.com',
                 'X-Title': 'Unlimited AI Text Generator',
               },
               body: JSON.stringify({
-                model: 'sao10k/l3.3-euryale-70b', // Specific model ID for OpenRouter
+                model: openRouterModel,
                 messages: [
                   {
                     role: 'system',
@@ -168,10 +194,12 @@ export async function POST(request) {
 
           const data = await response.json();
           result = data.choices[0].message.content;
-          console.log('OpenRouter generation successful');
+          console.log(
+            `OpenRouter generation successful with ${openRouterModel}`
+          );
         } catch (error) {
-          console.error('Error with OpenRouter:', error);
-          throw new Error(`Error with OpenRouter: ${error.message}`);
+          console.error(`Error with OpenRouter model ${model}:`, error);
+          throw new Error(`Error with ${model}: ${error.message}`);
         }
       } else {
         // Fallback to Claude as default

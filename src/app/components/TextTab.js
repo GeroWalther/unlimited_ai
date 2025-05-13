@@ -29,15 +29,43 @@ export default function TextTab() {
       id: 'claude-sonnet',
       name: 'Claude 3.7 Sonnet',
       description:
-        'Most powerful model for creative writing with multilingual support',
+        'Most powerful model for creative writing with multilingual support. No NSFW content allowed.',
       apiPath: 'anthropic/claude-3.7-sonnet',
     },
     {
       id: 'sao10k-euryale-70b',
       name: 'Sao10K Euryale 70B',
       description:
-        'Advanced model for uncensored creative content with multilingual support',
+        'For Testing Only. Advanced model for uncensored creative content with multilingual support',
       apiPath: 'openrouter/sao10k-euryale-70b',
+    },
+    {
+      id: 'mancer-weaver',
+      name: 'Mancer Weaver',
+      description:
+        'For Testing Only. Verbose model specialized for roleplay and narrative situations',
+      apiPath: 'mancer/weaver',
+    },
+    {
+      id: 'mythomax-l2-13b',
+      name: 'MythoMax 13B',
+      description:
+        'For Testing Only. High-performing model with rich descriptions and roleplay capabilities',
+      apiPath: 'gryphe/mythomax-l2-13b',
+    },
+    {
+      id: 'ministral-8b',
+      name: 'Ministral 8B',
+      description:
+        'For Testing Only. Efficient model optimized for knowledge-intensive tasks and reasoning',
+      apiPath: 'mistral/ministral-8b',
+    },
+    {
+      id: 'shisa-v2-llama3',
+      name: 'Shisa V2 Llama 3.3 70B',
+      description:
+        'For Testing Only. Showed good results. Bilingual Japanese-English chat model with strong capabilities and recommended for NSFW uncensored content.',
+      apiPath: 'shisa-ai/shisa-v2-llama3.3-70b:free',
     },
   ];
 
@@ -159,10 +187,10 @@ export default function TextTab() {
         {/* Story type banner */}
         {storyType === 'erotic' && (
           <div className='bg-pink-900/30 border border-pink-500/30 rounded-md p-3 mb-4 text-sm text-white/90'>
-            <p>For NSFW supported.</p>
+            <p>For NSFW uncensored content supported.</p>
             <p className='mt-1 text-xs text-white/80'>
-              Content is generated with refined, literary quality similar to
-              published novels.
+              Generated with refined, literary quality similar to published
+              novels.
             </p>
           </div>
         )}
