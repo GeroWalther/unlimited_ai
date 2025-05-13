@@ -12,7 +12,7 @@ export default function AnimatedHeader() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, type: 'spring', stiffness: 50 }}>
-            Create.
+            Create
           </motion.span>
           <motion.span
             className='gradient-text gradient-2'
@@ -24,7 +24,7 @@ export default function AnimatedHeader() {
               type: 'spring',
               stiffness: 50,
             }}>
-            Imagine.
+            Imagine
           </motion.span>
           <motion.span
             className='gradient-text gradient-3'
@@ -36,7 +36,7 @@ export default function AnimatedHeader() {
               type: 'spring',
               stiffness: 50,
             }}>
-            Inspire.
+            Inspire
           </motion.span>
         </h1>
       </div>
