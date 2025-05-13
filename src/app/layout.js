@@ -73,8 +73,8 @@ export const metadata = {
     images: [
       {
         url: 'https://vision-x-nu.vercel.app/ai-art.webp',
-        width: 1200,
-        height: 1200,
+        width: 1024,
+        height: 1024,
         alt: 'VisionX AI',
       },
     ],
