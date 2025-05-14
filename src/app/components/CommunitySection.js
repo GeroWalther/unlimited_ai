@@ -6,26 +6,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ImageModal from './ImageModal';
 import { getUserId } from '@/lib/auth';
 
-// Mock data for fallback
-const mockCommunityItems = [
-  {
-    id: '1',
-    type: 'text',
-    title: 'Neon City Sunset',
-    username: 'retrowave',
-    likes: 423,
-  },
-  {
-    id: '2',
-    type: 'text',
-    title:
-      'The year was 2099. The neon lights of Neo-Miami illuminated the rain-slicked streets...',
-    username: 'cyberpunk_writer',
-    likes: 189,
-  },
-  // Additional mock items still included for fallback...
-];
-
 // Fetch community content from API
 async function fetchCommunityItems(page = 1, pageSize = 8) {
   try {
@@ -174,14 +154,12 @@ export default function CommunitySection() {
   // Fetch community data with React Query
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['community', page],
-    queryFn: () => fetchCommunityItems(page),
-    // Fallback to mock data if fetching fails (during development)
-    placeholderData: {
-      items: mockCommunityItems,
-      page: 1,
-      pageSize: 8,
-      total: mockCommunityItems.length,
+    queryFn: async () => {
+      const result = await fetchCommunityItems(page);
+      // console.log('API RESPONSE:', result);
+      return result;
     },
+    // Remove placeholderData so we don't fall back to mock data
     staleTime: 60000, // 1 minute
   });
 
@@ -312,7 +290,6 @@ export default function CommunitySection() {
 
     return Math.max(0, backendLikes + adjustment);
   };
-
   return (
     <div className='mt-24'>
       <div className='text-center mb-12'>

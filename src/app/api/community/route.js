@@ -20,7 +20,7 @@ export async function GET(req) {
     // Query from the community_feed view
     let query = supabase
       .from('community_feed')
-      .select('*')
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to);
 
