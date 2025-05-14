@@ -69,11 +69,11 @@ export const metadata = {
     title: 'VisionX AI',
     description:
       'Create stunning NSFW AI images, digital art, novel covers, and character illustrations with VisionX AI. Generate immersive AI novels in multiple languages with our advanced AI writing platform.',
-    url: 'https://vision-x-nu.vercel.app/',
+    url: 'https://vision-x.gw-intech.com/',
     siteName: 'VisionX AI',
     images: [
       {
-        url: 'https://vision-x-nu.vercel.app/ai-art.webp',
+        url: 'https://vision-x.gw-intech.com/ai-art.webp',
         width: 1024,
         height: 1024,
         alt: 'VisionX AI',
@@ -89,7 +89,7 @@ export const metadata = {
       'Create stunning NSFW AI images, digital art, novels, and character illustrations with our advanced AI platform',
     site: '@visionxai',
     creator: '@visionxai',
-    images: ['https://vision-x-nu.vercel.app/ai-art.webp'],
+    images: ['https://vision-x.gw-intech.com/ai-art.webp'],
   },
 };
 
